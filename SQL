@@ -50,3 +50,14 @@ INNER JOIN Purchasing.PurchaseOrderLines po
 ON s.StockItemID = po.StockItemID
 WHERE YEAR(po.LastReceiptDate)=2014 AND
 sp.StateProvinceName != 'Alabama' OR sp.StateProvinceName != 'Georgia';
+
+# 7
+SELECT AVG(DATEDIFF(day, o.OrderDate,i.ConfirmedDeliveryTime)), sp.StateProvinceName
+FROM Sales.Invoices i
+INNER JOIN Sales.Orders o
+ON i.OrderID = o.OrderID
+INNER JOIN Application.People p
+ON o.LastEditedBy = p.PersonID
+INNER JOIN Application.StateProvinces sp
+ON p.PersonID = sp.LastEditedBy
+GROUP BY sp.StateProvinceName;
