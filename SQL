@@ -1,14 +1,33 @@
  # 1
-select p.FullName, p.PhoneNumber as Personal_Phone_Number, p.FaxNumber as Personal_Fax_Number, 
-COALESCE(c.PhoneNumber, s.PhoneNumber) as Company_Phone_Number, COALESCE(c.FaxNumber, s.FaxNumber) as Company_Fax_Number
-from Application.People p
-left join Sales.Customers c 
-on (p.PersonID = c.PrimaryContactPersonID) or (p.PersonID = c.AlternateContactPersonID)
-left join Purchasing.Suppliers s 
-on (p.PersonID = s.PrimaryContactPersonID) or (p.PersonID = s.AlternateContactPersonID);
+SELECT p.FullName, p.PhoneNumber AS Personal_Phone_Number, p.FaxNumber AS Personal_Fax_Number, 
+COALESCE(c.PhoneNumber, s.PhoneNumber) AS Company_Phone_Number, COALESCE(c.FaxNumber, s.FaxNumber) AS Company_Fax_Number
+FROM Application.People p
+LEFT JOIN Sales.Customers c 
+ON (p.PersonID = c.PrimaryContactPersonID) OR (p.PersonID = c.AlternateContactPersonID)
+LEFT JOIN Purchasing.Suppliers s 
+ON (p.PersonID = s.PrimaryContactPersonID) OR (p.PersonID = s.AlternateContactPersonID);
 
 # 2
-select c.CustomerName
-from Application.People p
+SELECT c.CustomerName
+FROM Application.People p
 INNER JOIN Sales.Customers c
-on (p.PersonID = c.PrimaryContactPersonID) and (p.PhoneNumber = c.PhoneNumber);
+ON (p.PersonID = c.PrimaryContactPersonID) AND (p.PhoneNumber = c.PhoneNumber);
+
+# 3
+SELECT c.CustomerName, ct.TransactionDate
+FROM Sales.Customers c
+INNER JOIN Sales.CustomerTransactions ct
+ON c.CustomerID = ct.CustomerID
+WHERE ct.TransactionDate < '2016-01-01' 
+AND ct.CustomerID NOT IN 
+(SELECT distinct ct.CustomerID
+FROM Sales.CustomerTransactions ct
+WHERE ct.TransactionDate > '2016-01-01');
+
+# 4
+SELECT s.StockItemName, SUM(s.QuantityPerOuter) as total_quantity
+FROM Warehouse.StockItems s
+INNER JOIN Purchasing.PurchaseOrderLines p
+ON s.StockItemID = p.StockItemID
+WHERE YEAR(p.LastReceiptDate)=2013
+GROUP BY s.StockItemName;
