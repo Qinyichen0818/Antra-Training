@@ -31,3 +31,10 @@ INNER JOIN Purchasing.PurchaseOrderLines p
 ON s.StockItemID = p.StockItemID
 WHERE YEAR(p.LastReceiptDate)=2013
 GROUP BY s.StockItemName;
+
+# 5
+SELECT DISTINCT s.StockItemName
+FROM Warehouse.StockItems s
+INNER JOIN Purchasing.PurchaseOrderLines p
+ON s.StockItemID = p.StockItemID
+WHERE LEN(p.Description) >= 10;
