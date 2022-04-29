@@ -1,0 +1,14 @@
+ # 1
+select p.FullName, p.PhoneNumber as Personal_Phone_Number, p.FaxNumber as Personal_Fax_Number, 
+COALESCE(c.PhoneNumber, s.PhoneNumber) as Company_Phone_Number, COALESCE(c.FaxNumber, s.FaxNumber) as Company_Fax_Number
+from Application.People p
+left join Sales.Customers c 
+on (p.PersonID = c.PrimaryContactPersonID) or (p.PersonID = c.AlternateContactPersonID)
+left join Purchasing.Suppliers s 
+on (p.PersonID = s.PrimaryContactPersonID) or (p.PersonID = s.AlternateContactPersonID);
+
+# 2
+select c.CustomerName
+from Application.People p
+INNER JOIN Sales.Customers c
+on (p.PersonID = c.PrimaryContactPersonID) and (p.PhoneNumber = c.PhoneNumber);
