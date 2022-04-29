@@ -38,3 +38,15 @@ FROM Warehouse.StockItems s
 INNER JOIN Purchasing.PurchaseOrderLines p
 ON s.StockItemID = p.StockItemID
 WHERE LEN(p.Description) >= 10;
+
+# 6
+SELECT DISTINCT s.StockItemName
+FROM Warehouse.StockItems s
+INNER JOIN Application.People p
+ON s.LastEditedBy = p.PersonID
+INNER JOIN Application.StateProvinces sp
+ON p.PersonID = sp.LastEditedBy
+INNER JOIN Purchasing.PurchaseOrderLines po
+ON s.StockItemID = po.StockItemID
+WHERE YEAR(po.LastReceiptDate)=2014 AND
+sp.StateProvinceName != 'Alabama' OR sp.StateProvinceName != 'Georgia';
