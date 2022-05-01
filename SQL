@@ -72,3 +72,32 @@ ON o.LastEditedBy = p.PersonID
 INNER JOIN Application.StateProvinces sp
 ON p.PersonID = sp.LastEditedBy
 GROUP BY sp.StateProvinceName, MONTH(o.OrderDate);
+
+# 9 
+WITH Transaction_table AS (SELECT si.StockItemName,
+sum(case when s.Quantity < 0 then s.Quantity else 0 end) OVER(PARTITION BY s.CustomerID) as Sold, 
+sum(case when s.Quantity > 0 then s.Quantity else 0 end) OVER (PARTITION BY s.CustomerID) as Purchased
+FROM Warehouse.StockItemTransactions s
+INNER JOIN Warehouse.StockItems si
+ON s.StockItemID = si.StockItemID
+WHERE YEAR(s.TransactionOccurredWhen) = 2015) 
+SELECT t.StockItemName 
+FROM Transaction_table t
+WHERE t.Sold < t.Purchased;
+
+# 10
+WITH Contact_Table AS (
+SELECT c.CustomerID, c.CustomerName, c.PhoneNumber, p.FullName as Primary_Contact_Person
+FROM Sales.Customers c
+INNER JOIN Application.People p 
+ON c.PrimaryContactPersonID = p.PersonID) 
+SELECT ct.CustomerName, ct.PhoneNumber, ct.Primary_Contact_Person
+FROM Warehouse.StockItemTransactions st
+INNER JOIN Warehouse.StockItems s
+ON st.StockItemID = s.StockItemID
+INNER JOIN Contact_Table ct
+ON ct.CustomerID = st.CustomerID 
+WHERE YEAR(st.TransactionOccurredWhen) = 2016
+AND s.StockItemName LIKE '%mug%'
+AND st.Quantity <0 AND st.Quantity >-11
+
