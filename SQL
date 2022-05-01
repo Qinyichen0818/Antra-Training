@@ -145,3 +145,16 @@ INNER JOIN Warehouse.StockItemStockGroups sisg
 ON sg.StockGroupID = sisg.StockGroupID
 INNER JOIN stock_transaction_info sti
 ON sisg.StockItemID = sti.StockItemID
+
+# 14 Have no idea about 'no sale'
+SELECT Distinct si.StockItemName, c.CityName, MAX(pol.OrderedOuters)OVER(PARTITION BY c.CityName)
+FROM Application.Cities c
+INNER JOIN Purchasing.Suppliers s
+ON c.CityID = s.DeliveryCityID
+INNER JOIN Warehouse.StockItems si
+ON si.SupplierID = s.SupplierID
+INNER JOIN Purchasing.PurchaseOrderLines pol
+ON pol.StockItemID = si.StockItemID
+INNER JOIN Warehouse.StockItemTransactions sit
+ON sit.SupplierID = s.SupplierID
+WHERE YEAR(sit.TransactionOccurredWhen) = 2016
