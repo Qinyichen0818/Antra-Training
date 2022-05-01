@@ -81,6 +81,7 @@ FROM Warehouse.StockItemTransactions s
 INNER JOIN Warehouse.StockItems si
 ON s.StockItemID = si.StockItemID
 WHERE YEAR(s.TransactionOccurredWhen) = 2015) 
+
 SELECT t.StockItemName 
 FROM Transaction_table t
 WHERE t.Sold < t.Purchased;
@@ -91,6 +92,7 @@ SELECT c.CustomerID, c.CustomerName, c.PhoneNumber, p.FullName as Primary_Contac
 FROM Sales.Customers c
 INNER JOIN Application.People p 
 ON c.PrimaryContactPersonID = p.PersonID) 
+
 SELECT ct.CustomerName, ct.PhoneNumber, ct.Primary_Contact_Person
 FROM Warehouse.StockItemTransactions st
 INNER JOIN Warehouse.StockItems s
@@ -105,3 +107,26 @@ AND st.Quantity <0 AND st.Quantity >-11
 SELECT c.CityName
 FROM Application.Cities c
 WHERE c.ValidFrom > '2015-01-01'
+
+# 12
+WITH Transaction_info AS(
+SELECT s.CustomerID,si.StockItemName,s.Quantity,CAST(s.TransactionOccurredWhen AS date) AS transactiondate
+FROM Warehouse.StockItemTransactions s
+INNER JOIN Warehouse.StockItems si
+ON si.StockItemID = s.StockItemID)
+
+SELECT c.CustomerName, CONCAT(c.DeliveryAddressLine1,c.DeliveryAddressLine2) AS delivery_address,
+c.PhoneNumber, c1.CityName, sp.StateProvinceName, c2.CountryName, p.FullName AS contact_person_name,
+t.StockItemName, t.StockItemName
+FROM Sales.Customers c
+INNER JOIN Application.People p
+ON c.PrimaryContactPersonID = p.PersonID
+INNER JOIN Application.Cities c1
+ON c.DeliveryCityID = c1.CityID
+INNER JOIN Application.StateProvinces sp
+ON sp.StateProvinceID = c1.StateProvinceID
+INNER JOIN Application.Countries c2
+ON sp.CountryID = c2.CountryID
+INNER JOIN Transaction_info t
+ON t.CustomerID = c.CustomerID
+WHERE t.transactiondate = '2014-07-01'
