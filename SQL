@@ -101,3 +101,7 @@ WHERE YEAR(st.TransactionOccurredWhen) = 2016
 AND s.StockItemName LIKE '%mug%'
 AND st.Quantity <0 AND st.Quantity >-11
 
+# 11
+SELECT c.CityName
+FROM Application.Cities c
+WHERE c.ValidFrom > '2015-01-01'
