@@ -130,3 +130,18 @@ ON sp.CountryID = c2.CountryID
 INNER JOIN Transaction_info t
 ON t.CustomerID = c.CustomerID
 WHERE t.transactiondate = '2014-07-01'
+
+# 13
+WITH stock_transaction_info AS(
+SELECT sum(il.Quantity) AS Sold, sum(pol.OrderedOuters) AS Purchased, il.StockItemID
+FROM Sales.InvoiceLines il
+INNER JOIN Purchasing.PurchaseOrderLines pol
+ON il.StockItemID = pol.StockItemID
+GROUP BY il.StockItemID)
+
+SELECT sg.StockGroupName, Sold,Purchased,(Purchased - Sold) As Remaining_Stock, sti.StockItemID
+FROM Warehouse.StockGroups sg
+INNER JOIN Warehouse.StockItemStockGroups sisg
+ON sg.StockGroupID = sisg.StockGroupID
+INNER JOIN stock_transaction_info sti
+ON sisg.StockItemID = sti.StockItemID
