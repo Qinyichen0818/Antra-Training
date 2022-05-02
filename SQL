@@ -158,3 +158,28 @@ ON pol.StockItemID = si.StockItemID
 INNER JOIN Warehouse.StockItemTransactions sit
 ON sit.SupplierID = s.SupplierID
 WHERE YEAR(sit.TransactionOccurredWhen) = 2016
+
+# 15
+SELECT i.OrderID
+FROM Sales.Invoices i
+WHERE JSON_VALUE(I.ReturnedDeliveryData, '$."Events"') LIKE '%DeliveryAttempt%DeliveryAttempt%';
+
+# 16
+SELECT s.StockItemName
+FROM Warehouse.StockItems s
+WHERE JSON_VALUE(CustomFields, '$."CountryOfManufacture"') = 'China';
+
+# 17
+SELECT SUM(i.Quantity) AS QuantitySold,
+JSON_VALUE(s.CustomFields, '$."CountryOfManufacture"') AS ManufactureCountry
+FROM Sales.InvoiceLines i
+INNER JOIN Warehouse.StockItems s
+ON i.StockItemID = s.StockItemID
+INNER JOIN Sales.CustomerTransactions c
+ON c.InvoiceID = i.InvoiceID
+WHERE YEAR(c.TransactionDate) = '2015'
+GROUP BY JSON_VALUE(s.CustomFields, '$."CountryOfManufacture"');
+
+# 18
+
+
