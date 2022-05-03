@@ -181,5 +181,27 @@ WHERE YEAR(c.TransactionDate) = '2015'
 GROUP BY JSON_VALUE(s.CustomFields, '$."CountryOfManufacture"');
 
 # 18
+GO
+CREATE VIEW Stock_Info
+With SCHEMABINDING
+AS
+SELECT StockGroupName,[2013], [2014], [2015], [2016], [2017]
+FROM(
+SELECT sg.StockGroupName, SUM(i.Quantity) AS TotalQuantity, YEAR(c.TransactionDate) AS Sold_year
+FROM Sales.InvoiceLines i
+INNER JOIN Warehouse.StockItemStockGroups sisg
+ON i.StockItemID = sisg.StockItemID
+INNER JOIN Warehouse.StockGroups sg
+ON sisg.StockGroupID = sg.StockGroupID
+INNER JOIN Sales.CustomerTransactions c
+ON c.InvoiceID = I.InvoiceID
+WHERE YEAR(C.TransactionDate) BETWEEN '2013' AND '2017'
+GROUP BY YEAR(c.TransactionDate),sg.StockGroupName) AS Sold_Info
+PIVOT 
+(
+SUM(TotalQuantity)
+FOR Sold_year IN ([2013], [2014], [2015], [2016], [2017])
+) AS PivotTable;
+
 
 
