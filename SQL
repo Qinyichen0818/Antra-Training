@@ -231,3 +231,19 @@ SUM(TotalQuantity)
 FOR StockGroupName IN ([T-Shirts], [USB Novelties], [Packaging Materials], 
 [Clothing], [Novelty Items],[Furry Footwear],[Mugs],[Computing Novelties],[Toys])
 ) AS PivotTable;
+
+# 20
+CREATE FUNCTION dbo.GetOrderInfo(@OrderID INT)
+RETURNS INT
+AS 
+BEGIN(
+SELECT SUM(s.Quantity) 
+FROM Sales.OrderLines s
+GROUP BY s.OrderID)
+END;
+GO
+SELECT *
+FROM Sales.Invoices I
+CROSS APPLY (
+SELECT dbo.GetOrderTotal(I.OrderID) AS Total_Order
+);
